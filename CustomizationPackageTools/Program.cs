@@ -254,7 +254,6 @@ namespace Velixo.Common.CustomizationPackageTools
         private static async Task ImportCustomization(List<string> cookies, string projectName, string description, int level, string baseUrl)
         {
             string packagePath = Path.Combine($"./Customization/{projectName}", $"{projectName}.zip");
-            Console.WriteLine($"level------>{level}");
 
             if (!File.Exists(packagePath))
             {

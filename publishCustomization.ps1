@@ -21,5 +21,3 @@ if (-not (Test-Path $zipFilePath)) {
 
 $cmd = "CustomizationPackageTools\bin\Release\net8.0\CustomizationPackageTools.exe"
 &$cmd publish --packagefilename $zipFilePath --packagename $packageName --url $serverUrl --username $username --password $password --description "$versionName" --level 250
-
-Write-Host "Customization package '$packageName' published successfully."
