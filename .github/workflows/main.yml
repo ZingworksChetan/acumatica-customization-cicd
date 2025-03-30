@@ -27,9 +27,9 @@ jobs:
       - name: Run Build Customization
         shell: pwsh
         run: |
-          ./buildCustomization.ps1 -versionName "${{ github.event.inputs.versionName }}"
+          ./buildCustomization.ps1 "${{ github.event.inputs.versionName }}"
 
       - name: Run Publish Customization
         shell: pwsh
         run: |
-          ./publishCustomization.ps1 -versionName "${{ github.event.inputs.versionName }}"
+          ./publishCustomization.ps1 "${{ github.event.inputs.versionName }}"
