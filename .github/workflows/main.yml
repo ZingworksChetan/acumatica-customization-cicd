@@ -1,0 +1,35 @@
+name: Deploy Acumatica Customization
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Enter the version name (e.g., SimpleCustomization20250329v6)'
+        required: true
+        type: string
+
+jobs:
+  build_and_publish:
+    runs-on: self-hoste
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set Up .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Run Build Customization
+        shell: pwsh
+        run: |
+          ./buildCustomization.ps1 -versionName "${{ github.event.inputs.versionName }}"
+
+      - name: Run Publish Customization
+        shell: pwsh
+        run: |
+          ./publishCustomization.ps1 -versionName "${{ github.event.inputs.versionName }}"
