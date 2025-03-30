@@ -155,9 +155,7 @@ namespace Velixo.Common.CustomizationPackageTools
             EndpointAddress address = new EndpointAddress(url + "/api/ServiceGate.asmx");
             var gate = new ServiceGate.ServiceGateSoapClient(binding, address);
 
-            Console.WriteLine($"Logging in to {url}...");
-            Console.WriteLine($"username---> {username} + {password}");
-
+            Console.WriteLine($"\nLogging in to {url}...");
             var cookies = await AcumaticaLogin(url, username, password);
 
             if (cookies == null || cookies.Count == 0)
@@ -166,18 +164,15 @@ namespace Velixo.Common.CustomizationPackageTools
                 return;
             }
 
-            Console.WriteLine("Login successful! Proceeding with package upload...");
-
-            Console.WriteLine($"Uploading package...");
+            Console.WriteLine($"\nImporting the package...");
             await ImportCustomization(cookies, packageName, description, level, url);
-            //await gate.UploadPackageAsync(packageName, File.ReadAllBytes(packageFilename), true);
 
-            Console.WriteLine($"Fetching already published projects...");
+            Console.WriteLine($"\nFetching already published projects...");
             string allProjectNamesString = await GetPublished(url, cookies, packageName);
             string[] allProjectNames = allProjectNamesString.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            Console.WriteLine($"All Published Projects: {string.Join(", ", allProjectNames)}");
+            Console.WriteLine($"\nProjects to published: {string.Join(", ", allProjectNames)}");
 
-            Console.WriteLine($"Publishing customizations...");
+            Console.WriteLine($"\nPublishing customization project...");
             await PublishBegin(url, cookies, allProjectNames);
 
             bool isPublished = await CheckPublishStatus(url, cookies);
@@ -307,8 +302,7 @@ namespace Velixo.Common.CustomizationPackageTools
                 }
                 else
                 {
-                    //Console.WriteLine("Cookies: " + string.Join("; ", cookies));
-                    Console.WriteLine("Cookies detected successfully");
+                    Console.WriteLine("Fetching project list....");
                 }
 
                 client.DefaultRequestHeaders.Add("Cookie", string.Join("; ", cookies));
@@ -323,12 +317,10 @@ namespace Velixo.Common.CustomizationPackageTools
                     if (response.IsSuccessStatusCode)
                     {
                         var jsonResponse = await response.Content.ReadAsStringAsync();
-                        //Console.WriteLine("\nResponse from GetPublished API: " + jsonResponse);
 
                         try
                         {
                             var jsonObject = JsonDocument.Parse(jsonResponse).RootElement;
-                            //Console.WriteLine($"jsonObject-------->{jsonObject}");
 
                             if (jsonObject.TryGetProperty("projects", out JsonElement projectsElement))
                             {
@@ -338,7 +330,6 @@ namespace Velixo.Common.CustomizationPackageTools
                                     .Where(name => !name.Contains("SimpleCustomization"))
                                     .ToList();
 
-                                Console.WriteLine($"\nprojects----->{projects}");
                                 projects.Add(newProject);
                              
                                 return string.Join(",", projects);
@@ -455,9 +446,7 @@ namespace Velixo.Common.CustomizationPackageTools
                         else
                         {
                             string errorResponse = await response.Content.ReadAsStringAsync();
-                            Console.WriteLine($"Error checking publish status: {response.StatusCode} - {response.ReasonPhrase}");
-                            Console.WriteLine($"Response Body: {errorResponse}");
-                            throw;
+                            throw new Exception($"Error checking publish status: {response.StatusCode} - {response.ReasonPhrase}\nResponse Body: {errorResponse}");
                         }
                     }
                     catch (Exception ex)
