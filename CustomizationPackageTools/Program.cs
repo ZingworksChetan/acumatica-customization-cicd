@@ -457,11 +457,13 @@ namespace Velixo.Common.CustomizationPackageTools
                             string errorResponse = await response.Content.ReadAsStringAsync();
                             Console.WriteLine($"Error checking publish status: {response.StatusCode} - {response.ReasonPhrase}");
                             Console.WriteLine($"Response Body: {errorResponse}");
+                            throw;
                         }
                     }
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Exception checking publish status: {ex.Message}");
+                        throw;
                     }
 
                     // Adjust delay dynamically based on attempts
