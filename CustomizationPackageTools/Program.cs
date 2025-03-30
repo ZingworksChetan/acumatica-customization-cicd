@@ -19,19 +19,22 @@ namespace Velixo.Common.CustomizationPackageTools
     {
         static async Task Main(string[] args)
         {
-            Console.WriteLine(Environment.CommandLine);
+           try
+            {
 
-            var rootCommand = new RootCommand();
-            var buildCommand = new Command("build")
+                Console.WriteLine(Environment.CommandLine);
+
+                var rootCommand = new RootCommand();
+                var buildCommand = new Command("build")
             {
                 new Option<string>("--customizationpath", "The folder containing the customization source code (_project folder).") { IsRequired = true},
                 new Option<string>("--packagefilename", "The name of the customization package.") { IsRequired = true},
                 new Option<string>("--description", "The description of the customization project.") { IsRequired = true},
                 new Option<int>("--level", "The number representing the level that is used to resolve conflicts that arise if multiple modifications of the same items of the website are merged. Defaults to 0."),
             };
-            rootCommand.Add(buildCommand);
+                rootCommand.Add(buildCommand);
 
-            var publishCommand = new Command("publish")
+                var publishCommand = new Command("publish")
             {
                 new Option<string>("--packagefilename", "The name of the customization package file.") { IsRequired = true},
                 new Option<string>("--packagename", "The name of the customization.") { IsRequired = true},
@@ -42,37 +45,29 @@ namespace Velixo.Common.CustomizationPackageTools
                 new Option<int>("--level", "The customization level.") { IsRequired = true},
 
             };
-            rootCommand.Add(publishCommand);
+                rootCommand.Add(publishCommand);
 
-            buildCommand.Handler = CommandHandler.Create((string customizationPath, string packageFilename, string description, int level) =>
+                buildCommand.Handler = CommandHandler.Create((string customizationPath, string packageFilename, string description, int level) =>
+                {
+                    Console.WriteLine($"Generating customization package {packageFilename}...");
+                    BuildCustomizationPackage(customizationPath, packageFilename, description, level);
+                    Console.WriteLine("Done!");
+                });
+
+                publishCommand.Handler = CommandHandler.Create(async (string packageFilename, string packageName, string url, string username, string password, string description, int level) =>
+                {
+                    Console.WriteLine($"Publishing customization package {packageFilename} to {url}...");
+                    await PublishCustomizationPackage(packageFilename, packageName, url, username, password, description, level);
+                    Console.WriteLine("Done!");
+                });
+
+                await rootCommand.InvokeAsync(args);
+           }
+            catch (Exception ex)
             {
-                Console.WriteLine($"Generating customization package {packageFilename}...");
-                BuildCustomizationPackage(customizationPath, packageFilename, description, level);
-                Console.WriteLine("Done!");
-            });
-
-            publishCommand.Handler = CommandHandler.Create(async (string packageFilename, string packageName, string url, string username, string password, string description, int level) =>
-            {
-                Console.WriteLine($"Publishing customization package {packageFilename} to {url}...");
-                await PublishCustomizationPackage(packageFilename, packageName, url, username, password, description, level);
-                Console.WriteLine("Done!");
-                //try
-                //{
-                //    Console.WriteLine($"Publishing customization package {packageFilename} to {url}...");
-                //    await PublishCustomizationPackage(packageFilename, packageName, url, username, password);
-                //    Console.WriteLine("Done!");
-                //}
-                //catch (Exception ex)
-                //{
-                //    Console.WriteLine($"ERROR: {ex.Message}");
-                //    if (ex is System.ServiceModel.ProtocolException protoEx)
-                //    {
-                //        Console.WriteLine($"DETAILS: {protoEx.InnerException?.Message}");
-                //    }
-                //}
-            });
-
-            await rootCommand.InvokeAsync(args);
+                Console.WriteLine($"FATAL ERROR: {ex.Message}");
+                Environment.Exit(1);
+            }
         }
 
         private static void BuildCustomizationPackage(string customizationPath, string packageFilename, string description, int level)
@@ -146,49 +141,58 @@ namespace Velixo.Common.CustomizationPackageTools
 
         private static async Task PublishCustomizationPackage(string packageFilename, string packageName, string url, string username, string password, string description, int level)
         {
-            BasicHttpBinding binding = new BasicHttpBinding() { AllowCookies = true };
-            binding.Security.Mode = BasicHttpSecurityMode.None;
-            binding.OpenTimeout = new TimeSpan(0, 10, 0);
-            binding.SendTimeout = new TimeSpan(0, 10, 0);
-            binding.ReceiveTimeout = new TimeSpan(0, 10, 0);
-
-            EndpointAddress address = new EndpointAddress(url + "/api/ServiceGate.asmx");
-            var gate = new ServiceGate.ServiceGateSoapClient(binding, address);
-
-            Console.WriteLine($"\nLogging in to {url}...");
-            var cookies = await AcumaticaLogin(url, username, password);
-
-            if (cookies == null || cookies.Count == 0)
+            try
             {
-                Console.WriteLine("Login failed! Stopping execution.");
-                return;
+
+                BasicHttpBinding binding = new BasicHttpBinding() { AllowCookies = true };
+                binding.Security.Mode = BasicHttpSecurityMode.None;
+                binding.OpenTimeout = new TimeSpan(0, 10, 0);
+                binding.SendTimeout = new TimeSpan(0, 10, 0);
+                binding.ReceiveTimeout = new TimeSpan(0, 10, 0);
+
+                EndpointAddress address = new EndpointAddress(url + "/api/ServiceGate.asmx");
+                var gate = new ServiceGate.ServiceGateSoapClient(binding, address);
+
+                Console.WriteLine($"\nLogging in to {url}...");
+                var cookies = await AcumaticaLogin(url, username, password);
+
+                if (cookies == null || cookies.Count == 0)
+                {
+                    Console.WriteLine("Login failed! Stopping execution.");
+                    return;
+                }
+
+                Console.WriteLine($"\nImporting the package...");
+                await ImportCustomization(cookies, packageName, description, level, url);
+
+                Console.WriteLine($"\nFetching already published projects...");
+                string allProjectNamesString = await GetPublished(url, cookies, packageName);
+                string[] allProjectNames = allProjectNamesString.Split(',', StringSplitOptions.RemoveEmptyEntries);
+                Console.WriteLine($"\nProjects to published: {string.Join(", ", allProjectNames)}");
+
+                Console.WriteLine($"\nPublishing customization project...");
+                await PublishBegin(url, cookies, allProjectNames);
+
+                bool isPublished = await CheckPublishStatus(url, cookies);
+
+                if (isPublished)
+                {
+                    Console.WriteLine("------Build publish Successfully-------");
+                }
+                else
+                {
+                    Console.WriteLine("Publish failed or timed out.");
+                }
+
+
+                Console.WriteLine($"Logging out...");
+                await gate.LogoutAsync();
             }
-
-            Console.WriteLine($"\nImporting the package...");
-            await ImportCustomization(cookies, packageName, description, level, url);
-
-            Console.WriteLine($"\nFetching already published projects...");
-            string allProjectNamesString = await GetPublished(url, cookies, packageName);
-            string[] allProjectNames = allProjectNamesString.Split(',', StringSplitOptions.RemoveEmptyEntries);
-            Console.WriteLine($"\nProjects to published: {string.Join(", ", allProjectNames)}");
-
-            Console.WriteLine($"\nPublishing customization project...");
-            await PublishBegin(url, cookies, allProjectNames);
-
-            bool isPublished = await CheckPublishStatus(url, cookies);
-
-            if (isPublished)
+            catch (Exception ex)
             {
-                Console.WriteLine("------Build publish Successfully-------");
+                Console.WriteLine($"ERROR: {ex.Message}");
+                Environment.Exit(1); 
             }
-            else
-            {
-                Console.WriteLine("Publish failed or timed out.");
-            }
-
-
-            Console.WriteLine($"Logging out...");
-            await gate.LogoutAsync();
         }
 
         private static async Task<List<string>> AcumaticaLogin(string baseUrl, string username, string password)
@@ -224,7 +228,9 @@ namespace Velixo.Common.CustomizationPackageTools
                         if (cookies.Count == 0)
                         {
                             Console.WriteLine("Login succeeded but no cookies were received.");
-                            return null;
+                            //return null;
+                            return new List<string>(); // Avoid returning null
+
                         }
 
                         return cookies;
@@ -232,13 +238,15 @@ namespace Velixo.Common.CustomizationPackageTools
                     else
                     {
                         Console.WriteLine($"Login failed: {response.StatusCode} {response.ReasonPhrase}");
-                        return null;
+                        //return null;
+                        return new List<string>(); // Avoid returning null
                     }
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine($"Error logging in: {ex.Message}");
-                    return null;
+                    //return null;
+                    return new List<string>(); // Avoid returning null
                 }
             }
         }
@@ -305,7 +313,7 @@ namespace Velixo.Common.CustomizationPackageTools
                     Console.WriteLine("Fetching project list....");
                 }
 
-                client.DefaultRequestHeaders.Add("Cookie", string.Join("; ", cookies));
+                client.DefaultRequestHeaders.Add("Cookie", string.Join("; ", cookies ?? new List<string>()));
 
                 // Create an empty JSON body (most APIs expect this for POST requests)
                 var content = new StringContent("{}", Encoding.UTF8, "application/json");
@@ -327,7 +335,7 @@ namespace Velixo.Common.CustomizationPackageTools
                                 var projects = projectsElement
                                     .EnumerateArray()
                                     .Select(p => p.GetProperty("name").GetString())
-                                    .Where(name => !name.Contains("SimpleCustomization"))
+                                    .Where(name => !string.IsNullOrEmpty(name) && !name.Contains("SimpleCustomization"))
                                     .ToList();
 
                                 projects.Add(newProject);
@@ -429,7 +437,7 @@ namespace Velixo.Common.CustomizationPackageTools
                             if (isFailed)
                             {
                                 string errorMessage = jsonObject.TryGetProperty("log", out JsonElement log) && log.GetArrayLength() > 0
-                                    ? log[0].GetProperty("message").GetString()
+                                    ? log[0].GetProperty("message").GetString() ?? "Unknown error"
                                     : "Unknown error";
 
                                 Console.WriteLine($"Publish failed! Reason: {errorMessage}");
