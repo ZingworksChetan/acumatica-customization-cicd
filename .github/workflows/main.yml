@@ -1,15 +1,10 @@
 name: Deploy Acumatica Customization
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  workflow_dispatch:
-    inputs:
-      versionName:
-        description: 'Enter the version name (e.g., SimpleCustomization20250329v6)'
-        required: true
-        type: string
+  push:
+    tags:
+      - '*'  # Trigger on any tag push
+  workflow_dispatch:  # Manual trigger without requiring versionName input
 
 jobs:
   build_and_publish:
@@ -31,10 +26,15 @@ jobs:
           cd ..
         shell: pwsh
 
+      - name: Extract Version from Tag
+        if: startsWith(github.ref, 'refs/tags/')
+        run: echo "VERSION_NAME=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        shell: bash
+
       - name: Run Build Customization
         shell: pwsh
         run: |
-          ./buildCustomization.ps1 "${{ github.event.inputs.versionName }}"
+          ./buildCustomization.ps1 "${{ env.VERSION_NAME }}"
 
       - name: Run Publish Customization
         shell: pwsh
@@ -43,4 +43,4 @@ jobs:
           ACUMATICA_USERNAME: ${{ secrets.ACUMATICA_USERNAME }}
           ACUMATICA_PASSWORD: ${{ secrets.ACUMATICA_PASSWORD }}
         run: |
-          ./publishCustomization.ps1 "${{ github.event.inputs.versionName }}"
+          ./publishCustomization.ps1 "${{ env.VERSION_NAME }}"
