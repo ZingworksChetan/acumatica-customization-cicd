@@ -38,5 +38,9 @@ jobs:
 
       - name: Run Publish Customization
         shell: pwsh
+        env:
+          ACUMATICA_URL: ${{ secrets.ACUMATICA_URL }}
+          ACUMATICA_USERNAME: ${{ secrets.ACUMATICA_USERNAME }}
+          ACUMATICA_PASSWORD: ${{ secrets.ACUMATICA_PASSWORD }}
         run: |
           ./publishCustomization.ps1 "${{ github.event.inputs.versionName }}"

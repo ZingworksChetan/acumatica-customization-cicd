@@ -24,6 +24,6 @@ if (-not $files) {
 }
 
 $cmd = "CustomizationPackageTools\bin\Release\net8.0\CustomizationPackageTools.exe"
-&$cmd build --customizationpath $customizationPath --packagefilename $zipFileName --description "Build for $versionName" --level "250"
+&$cmd build --customizationpath $customizationPath --packagefilename $zipFileName --description "$versionName" --level "250"
 
 Write-Host "Customization package created successfully: $zipFileName"

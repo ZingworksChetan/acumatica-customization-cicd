@@ -9,9 +9,9 @@ if (-not $versionName) {
 
 $zipFilePath = "Customization\$versionName\$versionName.zip"
 $packageName = $versionName
-$serverUrl = "http://localhost/USSFence"
-$username = "admin"
-$password = "Zing@2025"
+$serverUrl = $env:ACUMATICA_URL
+$username = $env:ACUMATICA_USERNAME
+$password = $env:ACUMATICA_PASSWORD
 
 # Ensure the ZIP file exists
 if (-not (Test-Path $zipFilePath)) {
@@ -20,6 +20,6 @@ if (-not (Test-Path $zipFilePath)) {
 }
 
 $cmd = "CustomizationPackageTools\bin\Release\net8.0\CustomizationPackageTools.exe"
-&$cmd publish --packagefilename $zipFilePath --packagename $packageName --url $serverUrl --username $username --password $password --description "Publishing $versionName" --level 250
+&$cmd publish --packagefilename $zipFilePath --packagename $packageName --url $serverUrl --username $username --password $password --description "$versionName" --level 250
 
 Write-Host "Customization package '$packageName' published successfully."
