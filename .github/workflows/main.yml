@@ -1,9 +1,9 @@
 name: Deploy Acumatica Customization
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
     inputs:
       versionName:
@@ -23,6 +23,13 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 8.0.x
+     
+      - name: Build CustomizationPackageTools.exe
+        run: |
+          cd CustomizationPackageTools
+          dotnet build --configuration Release
+          cd ..
+        shell: pwsh
 
       - name: Run Build Customization
         shell: pwsh
