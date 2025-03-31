@@ -8,7 +8,7 @@ if (-not $versionName) {
 }
 
 $customizationPath = "Customization\$versionName"
-$zipFileName = "Customization\$versionName.zip"
+$zipFileName = "Customization\$versionName\$versionName.zip"
 
 # Ensure the version folder exists
 if (-not (Test-Path $customizationPath)) {
