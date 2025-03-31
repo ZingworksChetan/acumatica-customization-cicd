@@ -1,0 +1,42 @@
+﻿<EntityEndpoint Description="NAW">
+    <Endpoint xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="NAW" version="23.100.001" systemContractVersion="4" xmlns="http://www.acumatica.com/entity/maintenance/5.31">
+        <TopLevelEntity name="CustomizationProjects" screen="SM204505">
+            <Fields>
+                <Field name="CreatedBy" type="StringValue" />
+                <Field name="Description" type="StringValue" />
+                <Field name="LastModifiedOn" type="DateTimeValue" />
+                <Field name="Level" type="IntValue" />
+                <Field name="ProjectName" type="StringValue" />
+                <Field name="Published" type="BooleanValue" />
+                <Field name="ScreenNames" type="StringValue" />
+                <Field name="Selected" type="BooleanValue" />
+            </Fields>
+            <Mappings>
+                <Mapping field="CreatedBy">
+                    <To object="Projects" field="CreatedByID_Creator_Username" />
+                </Mapping>
+                <Mapping field="Description">
+                    <To object="Projects" field="Description" />
+                </Mapping>
+                <Mapping field="LastModifiedOn">
+                    <To object="Projects" field="LastModifiedDateTime" />
+                </Mapping>
+                <Mapping field="Level">
+                    <To object="Projects" field="Level" />
+                </Mapping>
+                <Mapping field="ProjectName">
+                    <To object="Projects" field="Name" />
+                </Mapping>
+                <Mapping field="Published">
+                    <To object="Projects" field="IsPublished" />
+                </Mapping>
+                <Mapping field="ScreenNames">
+                    <To object="Projects" field="ScreenNames" />
+                </Mapping>
+                <Mapping field="Selected">
+                    <To object="Projects" field="IsWorking" />
+                </Mapping>
+            </Mappings>
+        </TopLevelEntity>
+    </Endpoint>
+</EntityEndpoint>
