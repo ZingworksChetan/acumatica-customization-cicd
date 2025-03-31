@@ -46,3 +46,9 @@ jobs:
           ACUMATICA_PASSWORD: ${{ secrets.ACUMATICA_PASSWORD }}
         run: |
           ./publishCustomization.ps1 "${{ env.VERSION_NAME }}"
+
+      - name: Upload ZIP Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: acumatica-customization
+          path: Customization/${{ env.VERSION_NAME }}/*.zip
