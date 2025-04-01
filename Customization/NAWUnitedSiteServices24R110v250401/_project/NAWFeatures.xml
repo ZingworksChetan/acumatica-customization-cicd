@@ -1,5 +1,0 @@
-﻿<Table TableName="NAWFeatures">
-    <Column TableName="NAWFeatures" ColumnName="UsrUSSEnabled" ColumnType="bool" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="NAWFeatures" ColumnName="UsrPrototypeUSSEnabled" ColumnType="bool" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="NAWFeatures" ColumnName="UsrAvalaraUSSEnabled" ColumnType="bool" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-</Table>

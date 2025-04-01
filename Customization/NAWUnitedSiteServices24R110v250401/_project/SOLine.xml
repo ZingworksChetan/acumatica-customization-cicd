@@ -1,5 +1,0 @@
-﻿<Table TableName="SOLine">
-    <Column TableName="SOLine" ColumnName="UsrNAWApproved" ColumnType="bool" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="SOLine" ColumnName="UsrNAWApprovedBy" ColumnType="guid" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-    <Column TableName="SOLine" ColumnName="UsrNAWAllowZeroPrice" ColumnType="bool" AllowNull="True" DecimalPrecision="0" DecimalLength="0" IsNewColumn="True" IsUnicode="True" />
-</Table>

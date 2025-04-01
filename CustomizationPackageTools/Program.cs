@@ -122,7 +122,7 @@ namespace Velixo.Common.CustomizationPackageTools
 
             foreach (var file in Directory.GetFiles(currentDirectory))
             {
-                string targetZipFileName = file.Substring(rootDirectory.Length);
+                string targetZipFileName = file.Substring(rootDirectory.Length).Substring(1);
                 Console.WriteLine($"Adding {targetZipFileName} to customization project...");
 
                 archive.CreateEntryFromFile(file, targetZipFileName, CompressionLevel.Optimal);
@@ -334,7 +334,7 @@ namespace Velixo.Common.CustomizationPackageTools
                                 var projects = projectsElement
                                     .EnumerateArray()
                                     .Select(p => p.GetProperty("name").GetString())
-                                    .Where(name => !string.IsNullOrEmpty(name) && !name.Contains("NAWUnitedSiteServices"))
+                                    .Where(name => !string.IsNullOrEmpty(name) && !name.Contains("SimpleCustomization"))
                                     .ToList();
 
                                 projects.Add(newProject);
