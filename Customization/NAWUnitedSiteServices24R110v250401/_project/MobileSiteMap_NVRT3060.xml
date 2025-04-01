@@ -1,0 +1,1 @@
+﻿<MobileSiteMap ScreenID="NVRT3060" Script="update screen NVRT3060 {&#xD;&#xA;  update container &quot;WorkOrderSummary&quot; {    &#xD;&#xA;    Add Field &quot;UtilityLocateNbr&quot; {&#xD;&#xA;      container = &quot;WorkOrderSummary&quot;&#xD;&#xA;      placeBefore Field &quot;NoteText&quot;&#xD;&#xA;      }&#xD;&#xA;    }&#xD;&#xA;}" Type="update" />
