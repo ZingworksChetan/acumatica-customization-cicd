@@ -334,7 +334,7 @@ namespace Velixo.Common.CustomizationPackageTools
                                 var projects = projectsElement
                                     .EnumerateArray()
                                     .Select(p => p.GetProperty("name").GetString())
-                                    .Where(name => !string.IsNullOrEmpty(name) && !name.Contains("SimpleCustomization"))
+                                    .Where(name => !string.IsNullOrEmpty(name) && !name.Contains("AcumaticaESignIntegration"))
                                     .ToList();
 
                                 projects.Add(newProject);
