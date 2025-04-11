@@ -38,6 +38,13 @@ jobs:
         run: |
           ./buildCustomization.ps1 "${{ env.VERSION_NAME }}"
 
+      - name: Run UI Tests
+        shell: pwsh
+        run: |
+          cd .\UITestProject\
+          dotnet restore UITestProject/UITestProject.csproj
+          dotnet test 
+
       - name: Run Publish Customization
         shell: pwsh
         env:
