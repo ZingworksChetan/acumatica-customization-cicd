@@ -49,10 +49,9 @@ jobs:
       - name: Run UI Tests
         shell: pwsh
         run: |
-          cd .\UITestProject\
-          # dotnet restore UITestProject/UITestProject.csproj
-          dotnet restore UITestProject.csproj
-          dotnet test 
+          cd UITestProject
+          dotnet restore UITestProject.csproj --configfile ../NuGet.Config
+          dotnet test
 
       - name: Run Publish Customization
         shell: pwsh
