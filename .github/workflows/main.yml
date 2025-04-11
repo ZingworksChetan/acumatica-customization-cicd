@@ -14,11 +14,18 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set Up .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 8.0.x
-          install-dir: ${{ runner.temp }}/dotnet
+      # - name: Set Up .NET
+      #   uses: actions/setup-dotnet@v3
+      #   with:
+      #     dotnet-version: 8.0.x
+      #     install-dir: ${{ runner.temp }}/dotnet
+      - name: Manually Install .NET SDK
+        shell: pwsh
+        run: |
+          $installDir = "$env:RUNNER_TEMP\dotnet"
+          Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile install-dotnet.ps1
+          ./install-dotnet.ps1 -Channel 8.0 -InstallDir $installDir
+          echo "$installDir" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8
      
       - name: Build CustomizationPackageTools.exe
         run: |
