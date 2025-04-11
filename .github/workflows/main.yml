@@ -50,7 +50,8 @@ jobs:
         shell: pwsh
         run: |
           cd .\UITestProject\
-          dotnet restore UITestProject/UITestProject.csproj
+          # dotnet restore UITestProject/UITestProject.csproj
+          dotnet restore UITestProject.csproj
           dotnet test 
 
       - name: Run Publish Customization
